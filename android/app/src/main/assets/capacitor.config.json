@@ -1,0 +1,12 @@
+{
+	"appId": "ke.co.shuleni.studio",
+	"appName": "Shuleni Studio",
+	"webDir": "dist",
+	"server": {
+		"androidScheme": "https"
+	},
+	"android": {
+		"backgroundColor": "#0B0E11",
+		"allowMixedContent": false
+	}
+}

@@ -1,0 +1,70 @@
+name: Build Android APK
+
+on:
+  push:
+    branches:
+      - main
+      - master
+  workflow_dispatch:
+    inputs:
+      api_base_url:
+        description: 'Optional public backend URL for X Automation & AI Voiceover (e.g. https://your-app.run.app)'
+        required: false
+        default: ''
+
+jobs:
+  build-android-apk:
+    name: Compile Android Debug APK
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - name: Set up Java 21
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '21'
+
+      - name: Setup Android SDK
+        uses: android-actions/setup-android@v3
+
+      - name: Install dependencies
+        run: npm install
+
+      - name: Build web bundle
+        env:
+          VITE_API_BASE_URL: ${{ github.event.inputs.api_base_url || vars.VITE_API_BASE_URL || '' }}
+        run: npm run build
+
+      - name: Ensure Capacitor Android platform exists and sync
+        run: |
+          if [ ! -d "android" ]; then
+            npx cap add android
+          fi
+          npx cap sync android
+
+      - name: Grant execute permission for Gradle wrapper
+        run: chmod +x android/gradlew
+
+      - name: Build Debug APK
+        working-directory: android
+        run: ./gradlew assembleDebug --no-daemon
+
+      - name: Copy APK to friendly filename
+        run: |
+          mkdir -p release-apk
+          cp android/app/build/outputs/apk/debug/app-debug.apk release-apk/shuleni-studio-debug.apk
+
+      - name: Upload downloadable APK artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: shuleni-studio-apk
+          path: release-apk/shuleni-studio-debug.apk
+          retention-days: 30

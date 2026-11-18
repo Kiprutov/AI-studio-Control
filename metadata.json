@@ -1,0 +1,6 @@
+{
+  "name": "Shuleni Launch Film",
+  "description": "Animated product launch commercial and synchronized sound studio for shuleni.co.ke.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
